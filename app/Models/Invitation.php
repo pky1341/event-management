@@ -9,4 +9,9 @@ class Invitation extends Model
 {
     use HasFactory;
     protected $fillable = ['event_id','card_path','status'];
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
 }

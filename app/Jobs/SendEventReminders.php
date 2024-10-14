@@ -5,6 +5,7 @@ namespace App\Jobs;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use App\Models\Event;
+use App\Services\MessageService;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -27,15 +28,19 @@ class SendEventReminders implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(MessageService $messageService)
     {
         foreach ($this->event->guestGroups as $guestGroup) {
-            foreach ($guestGroup->guests as $guest) {
-                if ($guest->email) {
-                    Mail::to($guest->email)->send(new EventReminder($this->event, $guest));
-                }
-                // You could also implement SMS reminders here
+            if ($guestGroup->confirmation_status === 'attending') {
+                $message = $this->generateReminderMessage();
+                $messageService->sendWhatsAppMessage($guestGroup->mobile_number, $message);
+                $messageService->sendSMS($guestGroup->mobile_number, $message);
             }
         }
+    }
+    protected function generateReminderMessage()
+    {
+        return "Reminder: You have an upcoming event '{$this->event->title}' on {$this->event->date}. " .
+                "We look forward to seeing you there!";
     }
 }

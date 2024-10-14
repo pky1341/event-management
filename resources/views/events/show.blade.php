@@ -17,7 +17,6 @@
                         <p><strong>Location:</strong> {{ $event->location }}</p>
                         <p><strong>Max Guests:</strong> {{ $event->totalGuests }} / {{ $event->max_guests }}</p>
                         <p><strong>Details:</strong> {{ $event->details }}</p>
-
                         <h5 class="mt-4">Guest Groups</h5>
                         @if ($event->max_guests > 0)
                             <ul class="list-group">
@@ -35,12 +34,10 @@
                         <a href="{{ route('guest-groups.create', ['event' => $event]) }}" class="btn btn-success mt-3">
                             <i class="fas fa-plus-circle"></i> Add Guest Group
                         </a>
-
                         <h5 class="mt-4">Invitation</h5>
                         @if ($event->invitation)
                             <p>Status: {{ ucfirst($event->invitation->status) }}</p>
-                            <img src="{{ asset('storage/' . $event->invitation->card_path) }}" alt="Invitation Card"
-                                class="img-fluid mb-3">
+                            <img src="{{ asset('storage/' . $event->invitation->card_path) }}" alt="Invitation Card" class="img-fluid mb-3">
                             @if ($event->invitation->status === 'draft')
                                 <form action="{{ route('invitations.publish', $event) }}" method="POST">
                                     @csrf
@@ -51,11 +48,10 @@
                             @endif
                         @else
                             <p>No invitation created yet.</p>
-                            <a href="{{ route('invitations.create', $event) }}" class="btn btn-primary">
+                            <a href="{{ route('invitations.create', ['event' => $event]) }}" class="btn btn-primary">
                                 <i class="fas fa-envelope"></i> Create Invitation
                             </a>
                         @endif
-
                         <div class="mt-4">
                             <a href="{{ route('events.send-reminders', $event) }}" class="btn btn-warning">
                                 <i class="fas fa-bell"></i> Send Reminders

@@ -5,9 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\Invitation;
+use App\Services\MessageService;
+use Illuminate\Support\Facades\Storage;
 
 class InvitationController extends Controller
 {
+    protected $messageService;
+
+    public function __construct(MessageService $messageService)
+    {
+        $this->messageService = $messageService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -19,7 +27,7 @@ class InvitationController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Event $event)
+    public function create(int $event)
     {
         return view('invitations.create', compact('event'));
     }
@@ -27,7 +35,7 @@ class InvitationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request,Event $event)
+    public function store(Request $request,int $event)
     {
         $validatedData = $request->validate([
             'card_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -36,7 +44,7 @@ class InvitationController extends Controller
         $path = $request->file('card_image')->store('invitation_cards', 'public');
 
         $invitation = new Invitation([
-            'event_id' => $event->id,
+            'event_id' => $event,
             'card_path' => $path,
             'status' => 'draft',
         ]);
@@ -83,9 +91,10 @@ class InvitationController extends Controller
         $invitation->status = 'published';
         $invitation->save();
 
-        // Here you would typically send out the invitations to guests
-        // This could involve queuing jobs to send emails or SMS
+        foreach ($event->guestGroups as $guestGroup) {
+            $this->messageService->sendInvitation($event, $guestGroup);
+        }
 
-        return redirect()->route('events.show', $event)->with('success', 'Invitation published successfully.');
+        return redirect()->route('events.show', $event)->with('success', 'Invitation published and sent successfully.');
     }
 }

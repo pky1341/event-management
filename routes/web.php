@@ -18,3 +18,5 @@ Route::post('/guest-groups/{guestGroup}/confirm', [GuestGroupController::class, 
 Route::get('/events/{event}/send-reminders', [EventController::class, 'sendReminders'])->name('events.send-reminders');
 Route::get('/guest-groups/create/{event}', [GuestGroupController::class, 'create'])->name('guest-groups.create');
 Route::post('/guest-groups/store/{event}', [GuestGroupController::class, 'store'])->name('guest-groups.store');
+Route::get('/invitations/create/{event}', [InvitationController::class, 'create'])->name('invitations.create');
+Route::post('/invitations/store/{event}', [InvitationController::class, 'store'])->name('invitations.store');

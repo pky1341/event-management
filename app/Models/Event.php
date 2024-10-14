@@ -15,6 +15,10 @@ class Event extends Model
     {
         return $this->hasMany(GuestGroup::class);
     }
+    public function invitation()
+    {
+        return $this->hasOne(Invitation::class);
+    }
 
     public function getTotalGuestsAttribute()
     {

@@ -93,6 +93,6 @@ class EventController extends Controller
     public function sendReminders(Event $event)
     {
         SendEventReminders::dispatch($event);
-        return redirect()->route('events.show', $event)->with('success', 'Reminders sent successfully.');
+        return redirect()->route('events.show', $event)->with('success', 'Reminders have been queued for sending.');
     }
 }

@@ -72,32 +72,28 @@ class GuestGroupController extends Controller
             ]
         ]);
 
-        try {
+        // try {
             DB::transaction(function () use ($guestGroup, $validatedData) {
-                // Update the guest group with the confirmation
                 $guestGroup->update([
                     'confirmed_count' => $validatedData['attending_count'],
                     'confirmation_status' => 'confirmed'
                 ]);
-
-                // You might want to create individual guest records here
-                // if you're tracking individual guests
-
-                // Send confirmation notification to event organizer
-                // You could dispatch a notification here
             });
 
             return redirect()->route('guest-groups.confirmation-success')->with('success', 
                 'Thank you for confirming your attendance!'
             );
 
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 
-                'Sorry, there was an error processing your confirmation. Please try again.'
-            )->withInput();
-        }
+        // } catch (\Exception $e) {
+        //     return redirect()->back()->with('error', 
+        //         'Sorry, there was an error processing your confirmation. Please try again.'
+        //     )->withInput();
+        // }
     }
-
+    public function confirmationSuccess()
+    {
+        return view('guest_groups.confirmation-success');
+    }
     /**
      * Display the specified resource.
      */

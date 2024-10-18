@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layout')
 
 @section('content')
 <div class="container">
@@ -14,7 +14,6 @@
                     </div>
                     <h5 class="mb-3">Your attendance has been confirmed</h5>
                     <p class="mb-4">We look forward to seeing you at the event!</p>
-                    
                     @if(session('success'))
                         <div class="alert alert-success">
                             {{ session('success') }}

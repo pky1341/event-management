@@ -24,7 +24,7 @@ class MessageService
         $imageUrl = url('storage/' . $event->invitation->card_path);
 
         // Send WhatsApp message
-        // $this->sendWhatsAppMessage($guestGroup->mobile_number, $message, $imageUrl);
+        $this->sendWhatsAppMessage($guestGroup->mobile_number, $message, $imageUrl);
 
         // Send SMS as a fallback
         $this->sendSMS($guestGroup->mobile_number, $message);
@@ -35,7 +35,7 @@ class MessageService
         return "You're invited to {$event->title}!\n"
             . "Date: {$event->date}\n"
             . "Location: {$event->location}\n"
-            . "Please confirm your attendance: " . route('guest-groups.confirm', $event->id);
+            . "Please confirm your attendance: " . route('guest.confirm.page', $event->id);
     }
 
     protected function sendWhatsAppMessage($to, $message, $imageUrl = null)
@@ -48,7 +48,7 @@ class MessageService
 
         if ($imageUrl) {
             $mediaUrl = $client->messages
-                ->create($twilioPhoneNumber, [
+                ->create('whatsapp:'.$to, [
                     'from' => 'whatsapp:' . $twilioPhoneNumber,
                     'body' => $message,
                     'mediaUrl' => $imageUrl,
@@ -56,23 +56,12 @@ class MessageService
                 ->mediaUrl;
         } else {
             $client->messages
-                ->create($to, [
+                ->create('whatsapp:'.$to, [
                     'from' => 'whatsapp:' . $twilioPhoneNumber,
                     'body' => $message,
                 ]);
         }
     }
-    // protected function sendWhatsAppMessage($to, $message, $imageUrl = null)
-    // {
-    //     // Implement WhatsApp API call here
-    //     // This is a placeholder and should be replaced with actual API call
-    //     Http::post('https://api.whatsapp.com/send', [
-    //         'api_key' => $this->whatsappApiKey,
-    //         'to' => $to,
-    //         'message' => $message,
-    //         'image_url' => $imageUrl ? $imageUrl : '',
-    //     ]);
-    // }
 
     protected function sendSMS($to, $message)
     {
@@ -87,14 +76,4 @@ class MessageService
                 'body' => $message,
             ]);
     }
-    // protected function sendSMS($to, $message)
-    // {
-    //     // Implement SMS API call here
-    //     // This is a placeholder and should be replaced with actual API call
-    //     Http::post('https://api.sms.com/send', [
-    //         'api_key' => $this->smsApiKey,
-    //         'to' => $to,
-    //         'message' => $message,
-    //     ]);
-    // }
 }

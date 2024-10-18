@@ -13,9 +13,9 @@
                     <p>Date: {{ $guestGroup->event->date }}</p>
                     <p>Location: {{ $guestGroup->event->location }}</p>
 
-                    <form action="{{ route('guest-groups.update-confirmation', $guestGroup) }}" method="POST">
+                    <form action="{{ route('guest-groups.confirm', $guestGroup) }}" method="POST">
                         @csrf
-                        @method('PUT')
+                        @method('POST')
                         <div class="mb-3">
                             <label for="attending_count" class="form-label">How many people are attending?</label>
                             <input type="number" class="form-control" id="attending_count" name="attending_count" min="0" max="{{ $guestGroup->max_members }}" required>

@@ -14,6 +14,7 @@ Route::resource('guest-groups', GuestGroupController::class);
 Route::resource('guests', GuestController::class);
 
 Route::post('/events/{event}/publish-invitation', [InvitationController::class, 'publish'])->name('invitations.publish');
+Route::get('/guest-confirm-page/{guestGroup}', [GuestGroupController::class, 'confirmPage'])->name('guest.confirm.page');
 Route::post('/guest-groups/{guestGroup}/confirm', [GuestGroupController::class, 'confirm'])->name('guest-groups.confirm');
 Route::get('/events/{event}/send-reminders', [EventController::class, 'sendReminders'])->name('events.send-reminders');
 Route::get('/guest-groups/create/{event}', [GuestGroupController::class, 'create'])->name('guest-groups.create');

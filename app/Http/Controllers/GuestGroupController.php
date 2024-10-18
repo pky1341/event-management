@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\GuestGroup;
+use Illuminate\Support\Facades\DB;
 
 class GuestGroupController extends Controller
 {
@@ -47,18 +48,54 @@ class GuestGroupController extends Controller
         
         return redirect()->route('events.show', $event)->with('success', 'Guest group added successfully.');
     }
+
+    public function confirmPage(GuestGroup $guestGroup){
+        $guestGroup->load('event');
+
+        // if (!$guestGroup || !$guestGroup->event) {
+        //     abort(404, 'Invalid invitation link');
+        // }
+
+        // if (now()->isAfter($guestGroup->event->date)) {
+        //     return redirect()->back()->with('error', 'This event has already passed.');
+        // }
+        return view('guest_groups.confirm', compact('guestGroup'));
+    }
     public function confirm(Request $request, GuestGroup $guestGroup)
     {
         $validatedData = $request->validate([
-            'confirmation_status' => 'required|in:attending,not_attending',
-            'actual_members' => 'required|integer|min:1|max:' . $guestGroup->max_members,
+            'attending_count' => [
+                'required',
+                'integer',
+                'min:0',
+                'max:' . $guestGroup->max_members
+            ]
         ]);
 
-        $guestGroup->confirmation_status = $validatedData['confirmation_status'];
-        $guestGroup->actual_members = $validatedData['actual_members'];
-        $guestGroup->save();
+        try {
+            DB::transaction(function () use ($guestGroup, $validatedData) {
+                // Update the guest group with the confirmation
+                $guestGroup->update([
+                    'confirmed_count' => $validatedData['attending_count'],
+                    'confirmation_status' => 'confirmed'
+                ]);
 
-        return redirect()->back()->with('success', 'Confirmation submitted successfully.');
+                // You might want to create individual guest records here
+                // if you're tracking individual guests
+
+                // Send confirmation notification to event organizer
+                // You could dispatch a notification here
+            });
+
+            return redirect()->route('guest-groups.confirmation-success')->with('success', 
+                'Thank you for confirming your attendance!'
+            );
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 
+                'Sorry, there was an error processing your confirmation. Please try again.'
+            )->withInput();
+        }
     }
 
     /**
